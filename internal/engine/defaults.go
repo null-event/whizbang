@@ -1,8 +1,12 @@
 package engine
 
+import (
+	"github.com/nullevent/whizbang/internal/probe/cred"
+)
+
 func NewDefaultAuditRegistry() *Registry {
 	reg := NewRegistry()
-	// Probes will be registered here as they're implemented
+	reg.Register(cred.New001())
 	return reg
 }
 
