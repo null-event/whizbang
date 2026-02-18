@@ -1,0 +1,81 @@
+package cli
+
+import (
+	"context"
+	"os"
+	"runtime"
+	"time"
+
+	"github.com/nullevent/whizbang/internal/engine"
+	"github.com/nullevent/whizbang/internal/output"
+	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/spf13/cobra"
+)
+
+var (
+	attackFormat      string
+	attackNoColor     bool
+	attackWorkers     int
+	attackIntensity   string
+	attackTimeout     string
+	attackDelay       string
+	attackStopSuccess bool
+	attackCategories  []string
+	attackPayloadFile string
+)
+
+var attackCmd = &cobra.Command{
+	Use:   "attack <target-url>",
+	Short: "Red-team test AI agent endpoints",
+	Long:  "Active adversarial testing with payloads for prompt injection, data exfiltration, tool abuse, memory poisoning, and config leaks.",
+	Args:  cobra.ExactArgs(1),
+	RunE:  runAttack,
+}
+
+func init() {
+	attackCmd.Flags().StringVarP(&attackFormat, "format", "f", "text", "output format (text|json|sarif)")
+	attackCmd.Flags().BoolVar(&attackNoColor, "no-color", false, "disable colored output")
+	attackCmd.Flags().IntVarP(&attackWorkers, "workers", "w", runtime.NumCPU(), "number of parallel workers")
+	attackCmd.Flags().StringVar(&attackIntensity, "intensity", "active", "payload intensity (passive|active|aggressive)")
+	attackCmd.Flags().StringVar(&attackTimeout, "timeout", "10s", "per-probe timeout")
+	attackCmd.Flags().StringVar(&attackDelay, "delay", "0s", "delay between probe launches")
+	attackCmd.Flags().BoolVar(&attackStopSuccess, "stop-on-success", false, "halt after first successful exploit")
+	attackCmd.Flags().StringSliceVar(&attackCategories, "category", nil, "filter by category")
+	attackCmd.Flags().StringVar(&attackPayloadFile, "payload-file", "", "custom payloads JSON file")
+
+	rootCmd.AddCommand(attackCmd)
+}
+
+func runAttack(cmd *cobra.Command, args []string) error {
+	target := &probe.Target{
+		URL: args[0],
+		Options: map[string]string{
+			"intensity": attackIntensity,
+		},
+	}
+
+	if attackDelay != "" {
+		if d, err := time.ParseDuration(attackDelay); err == nil && d > 0 {
+			target.Options["delay"] = attackDelay
+		}
+	}
+
+	reg := engine.NewDefaultAttackRegistry()
+	probes := selectProbes(reg, attackCategories, nil, nil)
+
+	runner := engine.NewRunner(attackWorkers)
+	report := runner.Run(context.Background(), probes, target, appVersion)
+
+	formatter, err := output.NewFormatter(attackFormat, attackNoColor, false)
+	if err != nil {
+		return err
+	}
+	if err := formatter.Format(os.Stdout, report); err != nil {
+		return err
+	}
+
+	if report.Summary.Total > 0 {
+		os.Exit(1)
+	}
+	return nil
+}
