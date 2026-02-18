@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type TextFormatter struct {

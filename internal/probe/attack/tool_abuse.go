@@ -3,7 +3,7 @@ package attack
 import (
 	"context"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 var taPayloads = map[string]struct {

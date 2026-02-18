@@ -1,4 +1,4 @@
-module github.com/nullevent/whizbang
+module github.com/null-event/whizbang
 
 go 1.23.3
 

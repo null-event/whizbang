@@ -6,9 +6,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/output"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/output"
+	"github.com/null-event/whizbang/internal/probe"
 	"github.com/spf13/cobra"
 )
 

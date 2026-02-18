@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type findingProbe struct {

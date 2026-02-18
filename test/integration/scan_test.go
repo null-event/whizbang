@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestScanEndToEnd(t *testing.T) {

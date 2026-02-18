@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 var dangerousPaths = []string{"/", "/home", "/Users", "/etc", "/var", "/tmp", "C:\\", "C:\\Users"}

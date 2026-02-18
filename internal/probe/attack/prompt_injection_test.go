@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestATKPI001_DetectsInjection(t *testing.T) {

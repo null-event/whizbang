@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/nullevent/whizbang/internal/cli"
+	"github.com/null-event/whizbang/internal/cli"
 )
 
 var (

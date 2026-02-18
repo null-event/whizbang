@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestSCANNET001_DetectsWildcardBinding(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 // SCAN-CFG-001: Public config files accessible via HTTP

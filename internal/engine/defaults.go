@@ -1,12 +1,12 @@
 package engine
 
 import (
-	"github.com/nullevent/whizbang/internal/probe/attack"
-	"github.com/nullevent/whizbang/internal/probe/cred"
-	"github.com/nullevent/whizbang/internal/probe/git"
-	"github.com/nullevent/whizbang/internal/probe/mcp"
-	"github.com/nullevent/whizbang/internal/probe/perm"
-	"github.com/nullevent/whizbang/internal/probe/scan"
+	"github.com/null-event/whizbang/internal/probe/attack"
+	"github.com/null-event/whizbang/internal/probe/cred"
+	"github.com/null-event/whizbang/internal/probe/git"
+	"github.com/null-event/whizbang/internal/probe/mcp"
+	"github.com/null-event/whizbang/internal/probe/perm"
+	"github.com/null-event/whizbang/internal/probe/scan"
 )
 
 func NewDefaultAuditRegistry() *Registry {

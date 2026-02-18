@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestTextFormatter(t *testing.T) {

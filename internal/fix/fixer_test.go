@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type fixableProbe struct {

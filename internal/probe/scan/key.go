@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 var responseKeyPatterns = []*regexp.Regexp{

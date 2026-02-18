@@ -3,7 +3,7 @@ package output
 import (
 	"io"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 	"github.com/owenrumney/go-sarif/v2/sarif"
 )
 
@@ -15,7 +15,7 @@ func (f *SARIFFormatter) Format(w io.Writer, report *probe.Report) error {
 		return err
 	}
 
-	run := sarif.NewRunWithInformationURI("whizbang", "https://github.com/nullevent/whizbang")
+	run := sarif.NewRunWithInformationURI("whizbang", "https://github.com/null-event/whizbang")
 	run.Tool.Driver.WithVersion(report.Version)
 
 	for _, finding := range report.Findings {

@@ -20,7 +20,7 @@
 
 **Step 1: Initialize Go module**
 
-Run: `go mod init github.com/nullevent/whizbang`
+Run: `go mod init github.com/null-event/whizbang`
 
 **Step 2: Install dependencies**
 
@@ -361,7 +361,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type stubProbe struct {
@@ -431,7 +431,7 @@ Expected: FAIL
 // internal/engine/registry.go
 package engine
 
-import "github.com/nullevent/whizbang/internal/probe"
+import "github.com/null-event/whizbang/internal/probe"
 
 type Registry struct {
 	probes []probe.Probe
@@ -524,7 +524,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type findingProbe struct {
@@ -640,7 +640,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type Runner struct {
@@ -732,7 +732,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestJSONFormatter(t *testing.T) {
@@ -775,7 +775,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type JSONFormatter struct{}
@@ -818,7 +818,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestTextFormatter(t *testing.T) {
@@ -880,7 +880,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type TextFormatter struct {
@@ -1007,7 +1007,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestSARIFFormatter(t *testing.T) {
@@ -1054,7 +1054,7 @@ package output
 import (
 	"io"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 	"github.com/owenrumney/go-sarif/v2/sarif"
 )
 
@@ -1066,7 +1066,7 @@ func (f *SARIFFormatter) Format(w io.Writer, report *probe.Report) error {
 		return err
 	}
 
-	run := sarif.NewRunWithInformationURI("whizbang", "https://github.com/nullevent/whizbang")
+	run := sarif.NewRunWithInformationURI("whizbang", "https://github.com/null-event/whizbang")
 	run.Tool.Driver.WithVersion(report.Version)
 
 	for _, finding := range report.Findings {
@@ -1170,7 +1170,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type Formatter interface {
@@ -1223,7 +1223,7 @@ package main
 import (
 	"os"
 
-	"github.com/nullevent/whizbang/internal/cli"
+	"github.com/null-event/whizbang/internal/cli"
 )
 
 var (
@@ -1338,9 +1338,9 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/output"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/output"
+	"github.com/null-event/whizbang/internal/probe"
 	"github.com/spf13/cobra"
 )
 
@@ -1505,9 +1505,9 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/output"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/output"
+	"github.com/null-event/whizbang/internal/probe"
 	"github.com/spf13/cobra"
 )
 
@@ -1610,9 +1610,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/output"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/output"
+	"github.com/null-event/whizbang/internal/probe"
 	"github.com/spf13/cobra"
 )
 
@@ -1697,10 +1697,10 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/fix"
-	"github.com/nullevent/whizbang/internal/output"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/fix"
+	"github.com/null-event/whizbang/internal/output"
+	"github.com/null-event/whizbang/internal/probe"
 	"github.com/spf13/cobra"
 )
 
@@ -1794,7 +1794,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/nullevent/whizbang/internal/fix"
+	"github.com/null-event/whizbang/internal/fix"
 	"github.com/spf13/cobra"
 )
 
@@ -1877,8 +1877,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nullevent/whizbang/internal/output"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/output"
+	"github.com/null-event/whizbang/internal/probe"
 	"github.com/spf13/cobra"
 )
 
@@ -2187,8 +2187,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type fixableProbe struct {
@@ -2246,8 +2246,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type Fixer struct {
@@ -2323,7 +2323,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestCRED001_DetectsHardcodedKeys(t *testing.T) {
@@ -2405,7 +2405,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 var keyPatterns = []*regexp.Regexp{
@@ -2509,7 +2509,7 @@ Expected: PASS
 package engine
 
 import (
-	"github.com/nullevent/whizbang/internal/probe/cred"
+	"github.com/null-event/whizbang/internal/probe/cred"
 )
 
 func NewDefaultAuditRegistry() *Registry {
@@ -2572,7 +2572,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestMCP001_DetectsBroadFilesystemAccess(t *testing.T) {
@@ -2643,7 +2643,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 var dangerousPaths = []string{"/", "/home", "/Users", "/etc", "/var", "/tmp", "C:\\", "C:\\Users"}
@@ -2737,7 +2737,7 @@ Expected: PASS
 
 Update `internal/engine/defaults.go` to add:
 ```go
-import "github.com/nullevent/whizbang/internal/probe/mcp"
+import "github.com/null-event/whizbang/internal/probe/mcp"
 // In NewDefaultAuditRegistry:
 reg.Register(mcp.New001())
 ```
@@ -2769,7 +2769,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestPERM001_DetectsWorldReadable(t *testing.T) {
@@ -2830,7 +2830,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 var sensitiveFiles = []string{
@@ -2931,7 +2931,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestGIT001_DetectsMissingPatterns(t *testing.T) {
@@ -3003,7 +3003,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 var requiredPatterns = []string{
@@ -3291,8 +3291,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/engine"
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/engine"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 func TestAuditEndToEnd(t *testing.T) {

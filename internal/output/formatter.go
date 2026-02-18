@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type Formatter interface {

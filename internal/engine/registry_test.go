@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 type stubProbe struct {

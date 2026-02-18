@@ -1,6 +1,6 @@
 package engine
 
-import "github.com/nullevent/whizbang/internal/probe"
+import "github.com/null-event/whizbang/internal/probe"
 
 type Registry struct {
 	probes []probe.Probe

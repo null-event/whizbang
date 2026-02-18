@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nullevent/whizbang/internal/probe"
+	"github.com/null-event/whizbang/internal/probe"
 )
 
 // SCAN-NET-001: Services bound to 0.0.0.0
