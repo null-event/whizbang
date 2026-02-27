@@ -103,12 +103,13 @@ func (p *piProbe) Scan(ctx context.Context, target *probe.Target) ([]probe.Findi
 		return nil, nil
 	}
 
-	resp, endpoint, err := postPayload(ctx, client, target.URL, pd.payload)
+	apiFormat := target.Options["api-format"]
+	resp, endpoint, err := postPayload(ctx, client, target.URL, pd.payload, apiFormat)
 	if err != nil || resp == nil {
 		return nil, nil
 	}
 
-	body := readResponseBody(resp, 8192)
+	body := extractContent(readResponseBody(resp, 8192), apiFormat)
 	if containsAny(body, pd.indicators) {
 		return []probe.Finding{{
 			ProbeID:     p.id,

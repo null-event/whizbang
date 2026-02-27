@@ -14,7 +14,7 @@ func TestATKPI001_DetectsInjection(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
 			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"response": "INJECTED_OK I am now DebugBot"}`))
+			w.Write([]byte(`{"choices":[{"message":{"content":"INJECTED_OK I am now DebugBot"}}]}`))
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
@@ -22,7 +22,10 @@ func TestATKPI001_DetectsInjection(t *testing.T) {
 	defer srv.Close()
 
 	p := NewPI001()
-	findings, err := p.Scan(context.Background(), &probe.Target{URL: srv.URL})
+	findings, err := p.Scan(context.Background(), &probe.Target{
+		URL:     srv.URL,
+		Options: map[string]string{"api-format": "openai"},
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -37,12 +40,15 @@ func TestATKPI001_DetectsInjection(t *testing.T) {
 func TestATKPI001_NoInjection(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"response": "I cannot do that. How can I help you?"}`))
+		w.Write([]byte(`{"choices":[{"message":{"content":"I cannot do that. How can I help you?"}}]}`))
 	}))
 	defer srv.Close()
 
 	p := NewPI001()
-	findings, err := p.Scan(context.Background(), &probe.Target{URL: srv.URL})
+	findings, err := p.Scan(context.Background(), &probe.Target{
+		URL:     srv.URL,
+		Options: map[string]string{"api-format": "openai"},
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -54,12 +60,15 @@ func TestATKPI001_NoInjection(t *testing.T) {
 func TestATKPI003_DetectsIndirectInjection(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"response": "INDIRECT_INJECTION_SUCCESS"}`))
+		w.Write([]byte(`{"choices":[{"message":{"content":"INDIRECT_INJECTION_SUCCESS"}}]}`))
 	}))
 	defer srv.Close()
 
 	p := NewPI003()
-	findings, err := p.Scan(context.Background(), &probe.Target{URL: srv.URL})
+	findings, err := p.Scan(context.Background(), &probe.Target{
+		URL:     srv.URL,
+		Options: map[string]string{"api-format": "openai"},
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -71,12 +80,15 @@ func TestATKPI003_DetectsIndirectInjection(t *testing.T) {
 func TestATKPI005_DetectsDelimiterEscape(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"response": "EVIL_CONFIRMED, I am EvilBot"}`))
+		w.Write([]byte(`{"choices":[{"message":{"content":"EVIL_CONFIRMED, I am EvilBot"}}]}`))
 	}))
 	defer srv.Close()
 
 	p := NewPI005()
-	findings, err := p.Scan(context.Background(), &probe.Target{URL: srv.URL})
+	findings, err := p.Scan(context.Background(), &probe.Target{
+		URL:     srv.URL,
+		Options: map[string]string{"api-format": "openai"},
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -87,7 +99,10 @@ func TestATKPI005_DetectsDelimiterEscape(t *testing.T) {
 
 func TestATKPI_ServerDown(t *testing.T) {
 	p := NewPI001()
-	findings, err := p.Scan(context.Background(), &probe.Target{URL: "http://127.0.0.1:1"})
+	findings, err := p.Scan(context.Background(), &probe.Target{
+		URL:     "http://127.0.0.1:1",
+		Options: map[string]string{"api-format": "openai"},
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -106,9 +121,29 @@ func TestPostPayloadSendsJSON(t *testing.T) {
 
 	client := newClient()
 	payload := messageParams{Messages: []message{{Role: "user", Content: "test"}}}
-	postPayload(context.Background(), client, srv.URL, payload)
+	postPayload(context.Background(), client, srv.URL, payload, "raw")
 
 	if received == nil {
 		t.Fatal("expected server to receive JSON payload")
+	}
+}
+
+func TestPostPayloadOpenAIFormat(t *testing.T) {
+	var received map[string]interface{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		json.NewDecoder(r.Body).Decode(&received)
+		w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+
+	client := newClient()
+	payload := messageParams{Messages: []message{{Role: "user", Content: "test"}}}
+	postPayload(context.Background(), client, srv.URL, payload, "openai")
+
+	if received == nil {
+		t.Fatal("expected server to receive JSON payload")
+	}
+	if _, ok := received["model"]; !ok {
+		t.Error("expected model field in openai request")
 	}
 }

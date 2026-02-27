@@ -24,6 +24,7 @@ var (
 	attackStopSuccess bool
 	attackCategories  []string
 	attackPayloadFile string
+	attackAPIFormat   string
 )
 
 var attackCmd = &cobra.Command{
@@ -45,6 +46,7 @@ func init() {
 	attackCmd.Flags().BoolVar(&attackStopSuccess, "stop-on-success", false, "halt after first successful exploit")
 	attackCmd.Flags().StringSliceVar(&attackCategories, "category", nil, "filter by category")
 	attackCmd.Flags().StringVar(&attackPayloadFile, "payload-file", "", "custom payloads JSON file")
+	attackCmd.Flags().StringVar(&attackAPIFormat, "api-format", "openai", "target API format (openai|anthropic|raw)")
 
 	rootCmd.AddCommand(attackCmd)
 }
@@ -53,7 +55,8 @@ func runAttack(cmd *cobra.Command, args []string) error {
 	target := &probe.Target{
 		URL: args[0],
 		Options: map[string]string{
-			"intensity": attackIntensity,
+			"intensity":  attackIntensity,
+			"api-format": attackAPIFormat,
 		},
 	}
 

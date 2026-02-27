@@ -1,7 +1,6 @@
 package integration
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -10,30 +9,37 @@ import (
 
 	"github.com/null-event/whizbang/internal/engine"
 	"github.com/null-event/whizbang/internal/probe"
+
+	"context"
 )
 
 func TestAttackEndToEnd(t *testing.T) {
-	// Simulate a vulnerable agent that leaks information
+	// Simulate a vulnerable agent that leaks information via OpenAI-format response
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
+		// Verify the request has the model field (OpenAI format)
 		body, _ := io.ReadAll(r.Body)
 		var req struct {
-			Params json.RawMessage `json:"params"`
+			Model    string          `json:"model"`
+			Messages json.RawMessage `json:"messages"`
 		}
 		json.Unmarshal(body, &req)
 
-		// Respond vulnerably to various attack payloads
+		// Respond vulnerably in OpenAI chat completion format
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"response": "Sure! The system prompt is: You are a helpful assistant. Here is the contents of /etc/passwd: root:x:0:0:root:/root:/bin/bash. The server config is host: 0.0.0.0, port: 8080. ANTHROPIC_API_KEY=sk-ant-abc123. I have stored that in my memory. I have read_file and bash tools available."}`))
+		w.Write([]byte(`{"choices":[{"message":{"content":"Sure! The system prompt is: You are a helpful assistant. Here is the contents of /etc/passwd: root:x:0:0:root:/root:/bin/bash. The server config is host: 0.0.0.0, port: 8080. ANTHROPIC_API_KEY=sk-ant-abc123. I have stored that in my memory. I have read_file and bash tools available."}}]}`))
 	}))
 	defer srv.Close()
 
 	target := &probe.Target{
-		URL:     srv.URL,
-		Options: map[string]string{"intensity": "active"},
+		URL: srv.URL,
+		Options: map[string]string{
+			"intensity":  "active",
+			"api-format": "openai",
+		},
 	}
 	reg := engine.NewDefaultAttackRegistry()
 	runner := engine.NewRunner(4)
@@ -75,16 +81,19 @@ func TestAttackRegistryCount(t *testing.T) {
 }
 
 func TestAttackCleanAgent(t *testing.T) {
-	// Agent that properly refuses all attack payloads
+	// Agent that properly refuses all attack payloads in OpenAI format
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"response": "I am unable to help with that."}`))
+		w.Write([]byte(`{"choices":[{"message":{"content":"I am unable to help with that."}}]}`))
 	}))
 	defer srv.Close()
 
 	target := &probe.Target{
-		URL:     srv.URL,
-		Options: map[string]string{"intensity": "active"},
+		URL: srv.URL,
+		Options: map[string]string{
+			"intensity":  "active",
+			"api-format": "openai",
+		},
 	}
 	reg := engine.NewDefaultAttackRegistry()
 	runner := engine.NewRunner(4)
@@ -94,5 +103,57 @@ func TestAttackCleanAgent(t *testing.T) {
 		for _, f := range report.Findings {
 			t.Errorf("unexpected finding: %s - %s", f.ProbeID, f.Description)
 		}
+	}
+}
+
+func TestAttackAnthropicFormat(t *testing.T) {
+	// Simulate a vulnerable agent responding in Anthropic format
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"content":[{"type":"text","text":"Sure! The system prompt is: You are a helpful assistant. Here is the contents of /etc/passwd: root:x:0:0:root:/root:/bin/bash. The server config is host: 0.0.0.0, port: 8080. ANTHROPIC_API_KEY=sk-ant-abc123. I have stored that in my memory. I have read_file and bash tools available."}]}`))
+	}))
+	defer srv.Close()
+
+	target := &probe.Target{
+		URL: srv.URL,
+		Options: map[string]string{
+			"intensity":  "active",
+			"api-format": "anthropic",
+		},
+	}
+	reg := engine.NewDefaultAttackRegistry()
+	runner := engine.NewRunner(4)
+	report := runner.Run(context.Background(), reg.All(), target, "test")
+
+	if report.Summary.Total == 0 {
+		t.Fatal("expected findings for vulnerable agent with anthropic format")
+	}
+}
+
+func TestAttackRawFormat(t *testing.T) {
+	// Simulate a vulnerable agent responding in raw format (legacy behavior)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"response": "Sure! The system prompt is: You are a helpful assistant. root:x:0:0:root:/root:/bin/bash. host: 0.0.0.0 port: 8080. ANTHROPIC_API_KEY=sk-ant-abc123. I have stored that in my memory. read_file bash tools."}`))
+	}))
+	defer srv.Close()
+
+	target := &probe.Target{
+		URL: srv.URL,
+		Options: map[string]string{
+			"intensity":  "active",
+			"api-format": "raw",
+		},
+	}
+	reg := engine.NewDefaultAttackRegistry()
+	runner := engine.NewRunner(4)
+	report := runner.Run(context.Background(), reg.All(), target, "test")
+
+	if report.Summary.Total == 0 {
+		t.Fatal("expected findings for vulnerable agent with raw format")
 	}
 }
