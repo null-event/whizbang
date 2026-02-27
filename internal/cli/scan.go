@@ -12,9 +12,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+
 var (
 	scanFormat     string
 	scanNoColor    bool
+	scanVerbose    bool
 	scanWorkers    int
 	scanTimeout    string
 	scanMaxConns   int
@@ -33,6 +35,7 @@ var scanCmd = &cobra.Command{
 func init() {
 	scanCmd.Flags().StringVarP(&scanFormat, "format", "f", "text", "output format (text|json|sarif)")
 	scanCmd.Flags().BoolVar(&scanNoColor, "no-color", false, "disable colored output")
+	scanCmd.Flags().BoolVarP(&scanVerbose, "verbose", "v", false, "show probe execution progress")
 	scanCmd.Flags().IntVarP(&scanWorkers, "workers", "w", runtime.NumCPU(), "number of parallel workers")
 	scanCmd.Flags().StringVar(&scanTimeout, "timeout", "10s", "per-probe timeout")
 	scanCmd.Flags().IntVar(&scanMaxConns, "max-connections", 10, "max concurrent HTTP connections")
@@ -49,6 +52,20 @@ func runScan(cmd *cobra.Command, args []string) error {
 	probes := selectProbes(reg, scanCategories, nil, scanExclude)
 
 	runner := engine.NewRunner(scanWorkers)
+	if scanVerbose {
+		runner.OnProbe = func(info probe.ProbeInfo, status engine.ProbeStatus, err error) {
+			switch status {
+			case engine.ProbeStatusStart:
+				fmt.Fprintf(os.Stderr, "  ▸ %-14s %s ...\n", info.ID, info.Name)
+			case engine.ProbeStatusFail:
+				fmt.Fprintf(os.Stderr, "  ✗ %-14s finding detected\n", info.ID)
+			case engine.ProbeStatusPass:
+				fmt.Fprintf(os.Stderr, "  ✓ %-14s no finding\n", info.ID)
+			case engine.ProbeStatusError:
+				fmt.Fprintf(os.Stderr, "  ! %-14s error: %v\n", info.ID, err)
+			}
+		}
+	}
 	report := runner.Run(context.Background(), probes, target, appVersion)
 	report.Summary.Grade = calculateGrade(report)
 

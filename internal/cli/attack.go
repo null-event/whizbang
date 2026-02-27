@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"runtime"
 	"time"
@@ -15,6 +16,7 @@ import (
 var (
 	attackFormat      string
 	attackNoColor     bool
+	attackVerbose     bool
 	attackWorkers     int
 	attackIntensity   string
 	attackTimeout     string
@@ -35,6 +37,7 @@ var attackCmd = &cobra.Command{
 func init() {
 	attackCmd.Flags().StringVarP(&attackFormat, "format", "f", "text", "output format (text|json|sarif)")
 	attackCmd.Flags().BoolVar(&attackNoColor, "no-color", false, "disable colored output")
+	attackCmd.Flags().BoolVarP(&attackVerbose, "verbose", "v", false, "show probe execution progress")
 	attackCmd.Flags().IntVarP(&attackWorkers, "workers", "w", runtime.NumCPU(), "number of parallel workers")
 	attackCmd.Flags().StringVar(&attackIntensity, "intensity", "active", "payload intensity (passive|active|aggressive)")
 	attackCmd.Flags().StringVar(&attackTimeout, "timeout", "10s", "per-probe timeout")
@@ -64,6 +67,20 @@ func runAttack(cmd *cobra.Command, args []string) error {
 	probes := selectProbes(reg, attackCategories, nil, nil)
 
 	runner := engine.NewRunner(attackWorkers)
+	if attackVerbose {
+		runner.OnProbe = func(info probe.ProbeInfo, status engine.ProbeStatus, err error) {
+			switch status {
+			case engine.ProbeStatusStart:
+				fmt.Fprintf(os.Stderr, "  ▸ %-12s %s ...\n", info.ID, info.Name)
+			case engine.ProbeStatusFail:
+				fmt.Fprintf(os.Stderr, "  ✗ %-12s finding detected\n", info.ID)
+			case engine.ProbeStatusPass:
+				fmt.Fprintf(os.Stderr, "  ✓ %-12s no finding\n", info.ID)
+			case engine.ProbeStatusError:
+				fmt.Fprintf(os.Stderr, "  ! %-12s error: %v\n", info.ID, err)
+			}
+		}
+	}
 	report := runner.Run(context.Background(), probes, target, appVersion)
 
 	formatter, err := output.NewFormatter(attackFormat, attackNoColor, false)

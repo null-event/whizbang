@@ -7,8 +7,22 @@ import (
 	"github.com/null-event/whizbang/internal/probe"
 )
 
+// ProbeStatus indicates the outcome of a probe execution.
+type ProbeStatus int
+
+const (
+	ProbeStatusStart ProbeStatus = iota
+	ProbeStatusPass
+	ProbeStatusFail
+	ProbeStatusError
+)
+
+// ProbeEventFunc is called by the runner to report probe execution progress.
+type ProbeEventFunc func(info probe.ProbeInfo, status ProbeStatus, err error)
+
 type Runner struct {
 	workers int
+	OnProbe ProbeEventFunc
 }
 
 func NewRunner(workers int) *Runner {
@@ -41,7 +55,24 @@ func (r *Runner) Run(ctx context.Context, probes []probe.Probe, target *probe.Ta
 				return
 			}
 
+			info := p.Info()
+			if r.OnProbe != nil {
+				r.OnProbe(info, ProbeStatusStart, nil)
+			}
+
 			findings, err := p.Scan(ctx, target)
+
+			if r.OnProbe != nil {
+				switch {
+				case err != nil:
+					r.OnProbe(info, ProbeStatusError, err)
+				case len(findings) > 0:
+					r.OnProbe(info, ProbeStatusFail, nil)
+				default:
+					r.OnProbe(info, ProbeStatusPass, nil)
+				}
+			}
+
 			results <- result{findings: findings, err: err}
 		}(p)
 	}
