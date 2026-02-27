@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/whizbang-mascot.svg" alt="whizbang mascot" width="300" />
+</p>
+
 # whizbang
 
 AI agent security scanner. Audits local configurations, scans remote endpoints, and red-teams AI agent deployments with a focus on MCP ecosystems.
