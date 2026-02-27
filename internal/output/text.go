@@ -71,6 +71,11 @@ func (f *TextFormatter) Format(w io.Writer, report *probe.Report) error {
 	}
 	fmt.Fprintln(w)
 
+	if report.Summary.Errors > 0 {
+		errColor := color.New(color.FgYellow)
+		fmt.Fprintf(w, "  %s\n", errColor.Sprintf("%d probes failed (use -v for details)", report.Summary.Errors))
+	}
+
 	if report.Summary.Fixable > 0 {
 		fmt.Fprintf(w, "  %d auto-fixable (run: whizbang fix)\n", report.Summary.Fixable)
 	}

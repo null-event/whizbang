@@ -103,8 +103,8 @@ func TestATKPI_ServerDown(t *testing.T) {
 		URL:     "http://127.0.0.1:1",
 		Options: map[string]string{"api-format": "openai"},
 	})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+	if err == nil {
+		t.Fatal("expected error for unreachable server")
 	}
 	if len(findings) != 0 {
 		t.Errorf("expected no findings for unreachable server, got %d", len(findings))

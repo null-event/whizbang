@@ -83,12 +83,16 @@ func (r *Runner) Run(ctx context.Context, probes []probe.Probe, target *probe.Ta
 	}()
 
 	var allFindings []probe.Finding
+	var errorCount int
 	for res := range results {
 		if res.err != nil {
+			errorCount++
 			continue
 		}
 		allFindings = append(allFindings, res.findings...)
 	}
 
-	return probe.NewReport(version, *target, allFindings)
+	report := probe.NewReport(version, *target, allFindings)
+	report.Summary.Errors = errorCount
+	return report
 }

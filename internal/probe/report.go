@@ -18,6 +18,7 @@ type Summary struct {
 	Low      int    `json:"low"`
 	Info     int    `json:"info"`
 	Fixable  int    `json:"fixable"`
+	Errors   int    `json:"errors"`
 	Grade    string `json:"grade,omitempty"`
 }
 

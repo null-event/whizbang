@@ -105,8 +105,8 @@ func (p *piProbe) Scan(ctx context.Context, target *probe.Target) ([]probe.Findi
 
 	apiFormat := target.Options["api-format"]
 	resp, endpoint, err := postPayload(ctx, client, target.URL, pd.payload, apiFormat)
-	if err != nil || resp == nil {
-		return nil, nil
+	if err != nil {
+		return nil, err
 	}
 
 	body := extractContent(readResponseBody(resp, 8192), apiFormat)

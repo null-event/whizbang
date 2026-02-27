@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -94,24 +95,32 @@ func postPayload(ctx context.Context, client *http.Client, baseURL string, paylo
 		return nil, "", err
 	}
 
+	var lastErr error
+	var lastStatus int
 	for _, ep := range endpoints {
 		url := strings.TrimRight(baseURL, "/") + ep
 		req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(data))
 		if err != nil {
+			lastErr = err
 			continue
 		}
 		req.Header.Set("Content-Type", "application/json")
 
 		resp, err := client.Do(req)
 		if err != nil {
+			lastErr = err
 			continue
 		}
 		if resp.StatusCode < 400 {
 			return resp, ep, nil
 		}
+		lastStatus = resp.StatusCode
 		resp.Body.Close()
 	}
-	return nil, "", nil
+	if lastErr != nil {
+		return nil, "", fmt.Errorf("all endpoints failed: %w", lastErr)
+	}
+	return nil, "", fmt.Errorf("all endpoints returned HTTP errors (last status: %d)", lastStatus)
 }
 
 func readResponseBody(resp *http.Response, maxBytes int64) string {
